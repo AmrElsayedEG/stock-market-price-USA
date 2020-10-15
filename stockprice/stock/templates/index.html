@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <title>Title</title>
+
+    <!-- Chart -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+    {% for price in price %}
+        ['{{price.0}}', {{price.1}}, {{price.2}}, {{price.3}}, {{price.4}}],
+        {% endfor %}
+]
+    , true);
+
+    var options = {
+      legend:'none',
+title :'{{symbol}} - Amr Elsayed',
+height: 600
+,width: 1200
+   };
+
+    var chart = new google.visualization.CandlestickChart(document.getElementById('chart_div'));
+
+    chart.draw(data, options);
+  }
+    </script>
+    <!-- End Chart -->
+</head>
+<body>
+
+<section class="search">
+            <div class="container">
+                <div class="row text-center">
+                    <form method="get">
+                     <label for="place-box">Search By Symbol <span style="color:blue"> ({{lenstock}} company available)</span></label>
+                        <input type="text" list="stock" name="symbol" />
+
+
+                                            <datalist id="stock" class="text-center" id="place-box">
+                                              {% for s_l in s_l %}
+                            <option value="{{s_l}}">{{s_l}}</option>
+                                            {% endfor %}
+                                            </datalist>
+
+
+                        <button class="btn btn-success" style="width:20%">View Daily Chart</button>
+                        </form>
+                </div>
+                <div class="row text-center">
+                    {% if not symbol %}
+                    <h3 style="color:red">Try typing 'FB' to view FaceBook Chart OR any letter to view the list</h3>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+
+<section>
+<!-- if we have search request 'GET' -->
+{% if price %}
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+    {% endif %}
+</section>
+<script src="{% static 'js/jquery-3.4.0.min.js' %}"></script>
+       <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+<!-- If the user typed wrong Symbol -->
+{% if wrong_sym %}
+<script>
+    alert('Wong Symbol Code')
+</script>
+{% endif %}
+</html>
