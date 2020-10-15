@@ -1,4 +1,7 @@
 from django.shortcuts import render, redirect
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
 from . import stockapi
 from .models import DailyPrice
 from django.db import IntegrityError
@@ -36,6 +39,16 @@ from rest_framework import generics
 from .serializers import DailyPriceSerializer
 from .models import DailyPrice
 
+class TokenAuthSupportQueryString(TokenAuthentication): #Override TokenAuthentication to have token inside url not in headers
+    def authenticate(self, request):
+        # Check if 'token_auth' is in the request query params.
+        # Give precedence to 'Authorization' header.
+        if 'auth_token' in request.query_params and \
+                        'HTTP_AUTHORIZATION' not in request.META:
+            return self.authenticate_credentials(request.query_params.get('auth_token'))
+        else:
+            return super(TokenAuthSupportQueryString, self).authenticate(request)
+
 class symbolData(generics.ListAPIView):
     queryset = DailyPrice.objects.all() #Gett All objects
     serializer_class = DailyPriceSerializer #add serializer
@@ -54,3 +67,5 @@ class symbolData(generics.ListAPIView):
             pass
         res = self.queryset.filter(symbol=self.kwargs.get('symbol')) #Get all stock price for particular symbol
         return res #return data to api
+    authentication_classes = [TokenAuthSupportQueryString]
+    permission_classes = [IsAuthenticated]

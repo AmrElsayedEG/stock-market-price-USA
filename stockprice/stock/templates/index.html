@@ -6,7 +6,10 @@
     <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
-    <title>Title</title>
+    <title>
+
+Stock Market Amr
+</title>
 
     <!-- Chart -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -60,6 +63,9 @@ height: 600
                     {% if not symbol %}
                     <h3 style="color:red">Try typing 'FB' to view FaceBook Chart OR any letter to view the list</h3>
                     {% endif %}
+                </div>
+                <div class="row text-center">
+                    <a class="btn btn-danger" href="https://documenter.getpostman.com/view/6434549/TVRq1kmo" target="_blank">See Quick API Documentation!</a>
                 </div>
             </div>
         </section>
