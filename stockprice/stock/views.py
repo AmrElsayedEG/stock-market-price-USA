@@ -1,12 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-
+import json
 from . import stockapi
 from .models import DailyPrice
 from django.db import IntegrityError
 api_key = 'SMRUPFC8PX39RTRT' #API Key
-
+from django.http import JsonResponse
 
 
 def home(request):
@@ -33,6 +33,49 @@ def home(request):
         'wrong_sym':wrong_sym
     }
     return render(request,'index.html',context)
+
+#AJAX Request View
+def home_ajax(request):
+    if request.method == 'POST' and request.is_ajax():
+        symbol = request.POST.get("symbol","")
+        try: #Try to get the prices for that symbol
+            price = stockapi.get_price_list_daily(symbol,api_key)
+            price.reverse() #Revese so we can view chart from older to newer data
+            price = json.dumps(price)
+            print("Done")
+        except: #If the symbol is wrong
+            wrong_sym = True #Wrong Symbol and show pop-up
+            price = 'None'
+            print("Fail")
+        
+        ctx = {'symbol':symbol,'price':price}
+        return HttpResponse(json.dumps(ctx), content_type='application/json')
+    s_l = stockapi.get_symbol() #Get all symbols list
+    wrong_sym = False #Default Value to know if the user searched for wrong symbol
+    price = None
+    symbol = None
+    context = {
+        's_l': s_l,
+        'price':price,
+        'symbol':symbol,
+        'lenstock':len(s_l),
+        'wrong_sym':wrong_sym
+    }
+    return render(request,'index-ajax.html',context)
+
+def update_chart(request):
+    symbol = request.POST.get("symbol","")
+    try: #Try to get the prices for that symbol
+        price = stockapi.get_price_list_daily(symbol,api_key)
+        price.reverse() #Revese so we can view chart from older to newer data
+        print("Done")
+    except: #If the symbol is wrong
+        wrong_sym = True #Wrong Symbol and show pop-up
+        price = None
+        print("Fail")
+    context = {'symbol':symbol,'price':price}
+    return render(request,'chart.html',context)
+###############################
 
 #Rest API
 from rest_framework import generics
