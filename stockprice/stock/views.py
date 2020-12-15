@@ -63,18 +63,7 @@ def home_ajax(request):
     }
     return render(request,'index-ajax.html',context)
 
-def update_chart(request):
-    symbol = request.POST.get("symbol","")
-    try: #Try to get the prices for that symbol
-        price = stockapi.get_price_list_daily(symbol,api_key)
-        price.reverse() #Revese so we can view chart from older to newer data
-        print("Done")
-    except: #If the symbol is wrong
-        wrong_sym = True #Wrong Symbol and show pop-up
-        price = None
-        print("Fail")
-    context = {'symbol':symbol,'price':price}
-    return render(request,'chart.html',context)
+
 ###############################
 
 #Rest API
